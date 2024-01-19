@@ -1,0 +1,20 @@
+In the "request validator" section, set "Validate query string parameters and headers".
+In the "URL query string parameters", add user_id and set Required as True.
+Test by passing a user_id from with API gateway and also see the error, when the user_id is not passed or a different key name is used.
+
+Now deploy the API and test from POSTMAN.
+
+Note that the url is different now, compared to POST method
+https://ap0qysyrn4.execute-api.us-east-1.amazonaws.com/Dev/compare-yourself/{type}
+If you try to access without passing (single or all) for {type} i.e. wrong URL, you will get 403 Forbidden error
+
+In POSTMAN, you can add user_id details in the params section or directly append at the end after a ? like below:
+https://ap0qysyrn4.execute-api.us-east-1.amazonaws.com/Dev/compare-yourself/single?user_id=a8097df1-84bf-4eb2-94f8-124c274e9d8c
+
+
+-- IMPORTANT Note
+
+The issue with setting Required as True for user_id is that even for type = all, i am forced to pass user_id and this doesn't make sense.
+So i unchecked Required as true but when using type = single, we need to pass user_id to get a correct return value.
+Else we will get a null reponse.
+

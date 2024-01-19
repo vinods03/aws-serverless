@@ -1,0 +1,9 @@
+In the "request validator" section, set "Validate query string parameters and headers".
+In the "URL query string parameters", add user_id and set Required as True.
+Test by passing a user_id from with API gateway and also see the error, when the user_id is not passed or a different key name is used.
+
+
+-- IMPORTANT Note
+
+Unlike GET method, where we did not enforce Required = True for user_id, here we have enforced this.
+We want to make sure we delete only specific rows and also we do not have a case like GET that could accept different path parmeters like all / single and query params is applicable only for single.

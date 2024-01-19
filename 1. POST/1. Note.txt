@@ -1,0 +1,7 @@
+The flow from API Gateway to Lambda is Method Request -> Integration Request
+The flow from Lambda to API Gateway is Integration Response -> Method Response
+
+Create a lambda function - compare-yourself-store-data
+Integrate this with API gateway resource / method
+See if you are able to extract required fields and return to API gateway
+Inserting into DynamoDB can be done later

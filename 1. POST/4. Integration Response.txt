@@ -1,0 +1,25 @@
+Response body (from lambda):
+
+lambdaData = {
+        'name': name,
+        'city': city,
+        'age': age
+    }
+    
+    return lambdaData
+
+Integration Response "Mapping Template":
+
+
+{
+   "nameFromLambda" : $input.json('$.name'),
+   "cityFromLambda" : $input.json('$.city'),
+   "ageFromLambda" : $input.json('$.age'),
+   "heightFromLambda" : $input.json('$.height'),
+   "incomeFromLambda" : $input.json('$.income')
+}
+
+Here:
+
+$input -> reponse data (return object)
+$ -> response body

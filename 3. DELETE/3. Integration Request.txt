@@ -1,0 +1,24 @@
+Why do we need the "mapping template" ?
+
+This is basically to ensure segregation of responsibilities.
+It is a good practice to ensure lambda  works with only the input it needs and doesnt have to parse the request body and extract the input it needs.
+The Integration Request Mapping template does the parsing / extraction.
+
+In the DELETE request, we are expecting the user id in query string parameters.
+
+Integration Request Mapping Template:
+
+{
+  "user_id" : "$input.params("user_id")"
+}
+
+Here:
+
+$input -> request data (params, query strings, body etc)
+$ -> request body -> but we dont need $ here
+
+
+Note:
+
+In Integration Request tab, if you enable Lambda Proxy Integration, you will not be able to modify / parse / extract input.
+Also, in Integration Response, you wwill not be able to modify / parse / extract lambda output.

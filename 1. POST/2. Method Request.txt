@@ -1,0 +1,41 @@
+This is a basic request validator "model" that can be used for a simple json object:
+
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "CompareData",
+  "type": "object",
+  "properties": {
+    "age": {"type": "integer"},
+    "height": {"type": "integer"},
+    "income": {"type": "integer"}
+  },
+  "required": ["age", "height", "income"]
+}
+
+In the "Method Request" section, we must set the "Request Validator" to "Validate body" and in the "Request body" section, we must provide the name of the above model.
+
+For a nested json object, this is how the request validator "model" will look like:
+Also, we have more validations at the field level here, like min value / max value / list of allowed values etc.
+
+
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "CompareDataPostModel",
+  "type": "object",
+  "properties": {
+    "personData": {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "city": {"type": "string", "enum": ["chennai", "mumbai", "bangalore", "delhi", "kolkata"]},
+            "age": {"type": "integer"},
+            "height": {"type": "number", "minimum": 4.0, "maximum": 6.5},
+            "income": {"type": "number"}
+        },
+        "required": ["name", "city", "age", "height", "income"]
+    }
+  },
+  "required": ["personData"]
+}
+
+

@@ -1,0 +1,38 @@
+Why do we need the "mapping template" ?
+
+This is basically to ensure segregation of responsibilities.
+It is a good practice to ensure lambda  works with only the input it needs and doesnt have to parse the request body and extract the input it needs.
+The Integration Request Mapping template does the parsing / extraction.
+
+Request body:
+
+{
+    "personData": {
+        "name": "vinod",
+        "city": "chennai",
+        "age": 43,
+        "height": 5,
+        "income": 110
+    }
+}
+
+Integration Request Mapping Template:
+
+{
+   "name" : $input.json('$.personData.name'),
+   "city" : $input.json('$.personData.city'),
+   "age" : $input.json('$.personData.age'),
+   "height" : $input.json('$.personData.height'),
+   "income" : $input.json('$.personData.income')
+}
+
+Here:
+
+$input -> request data (params, query strings, body etc)
+$ -> request body
+
+
+Note:
+
+In Integration Request tab, if you enable Lambda Proxy Integration, you will not be able to modify / parse / extract input.
+Also, in Integration Response, you wwill not be able to modify / parse / extract lambda output.

@@ -1,0 +1,14 @@
+The flow from API Gateway to Lambda is Method Request -> Integration Request
+The flow from Lambda to API Gateway is Integration Response -> Method Response
+
+
+For GET, we want to do both GET ALL and GET SPECIFIC
+So, under the main "compare-yourself" resource, we will create a resource with name {type} -> {} indicating variable
+Under this resource we will create GET method
+
+Create a lambda function - compare-yourself-get-data
+Integrate this with the above new API gateway resource / method
+First, see if you are able to extract required fields and return to API gateway
+Note that here, we need to extract from Path Parameters instead of Request body
+
+Get from DynamoDB can be done later

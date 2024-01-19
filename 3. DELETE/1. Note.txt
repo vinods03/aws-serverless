@@ -1,0 +1,7 @@
+The flow from API Gateway to Lambda is Method Request -> Integration Request
+The flow from Lambda to API Gateway is Integration Response -> Method Response
+
+Create a lambda function - compare-yourself-delete-data
+Integrate this with API gateway resource / method
+First, see if you are able to extract required fields and return to API gateway
+Delete from DynamoDB can be done later

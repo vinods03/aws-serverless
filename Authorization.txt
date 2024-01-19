@@ -1,0 +1,116 @@
+Steps:
+
+=== Cognito: Create user pool
+
+Cognito user pool sign-in options -> Choose email
+
+Leave the Cognito defaults for password
+
+No MFA
+
+Enable self-service account recovery 
+
+Delivery method for user account recovery messages -> Email only
+
+Enable self registration
+
+Allow Cognito to automatically send messages to verify and confirm -> Send email message, verify email address
+
+Keep original attribute value active when an update is pending - Recommended -> Email address
+
+No other additional attributes needed (other than email)
+
+Configure how your user pool sends email messages to users -> Send email with Cognito
+
+Leave the default FROM and TO email addresses
+
+User pool name -> compare-yourself-user-pool
+
+Initial app client -> Public client -> compare-yourself-app-client
+App clients are single-app platforms in your user pool that have permissions to call unauthenticated API operations. A user pool can have multiple app clients.
+
+Don't generate a client secret
+
+In the advanced app client settings, you can override defaults for access token / ID token / refresh token expiration duration, if you want to.
+Select all required options in "Authentication flows".
+
+Note down the user pool id, client id
+
+
+=== Cognito: Create user
+
+Provide email address, set password and send an email invitation. Once you create user, you will get email with the set password.
+
+In the Cognito Users screen, you will see Confirmation Status as "Force change password"
+
+
+=== Launch an EC2 instance, set the new password and get teh tokens.
+
+Run the below command, using the user pool id / client id noted earlier.
+
+aws cognito-idp admin-initiate-auth --user-pool-id us-east-1_LBf8LlhWB --client-id 2q824rr3duv29ln1oajmj6je8v --auth-flow ADMIN_NO_SRP_AUTH --auth-parameters USERNAME=vinods03@gmail.com,PASSWORD=L@50Cygy --region us-east-1
+
+You will get a NEW_PASSWORD_REQUIRED challenge name and a session id. Note the session id and use in below command:
+Provide the new password here.
+
+aws cognito-idp admin-respond-to-auth-challenge --user-pool-id us-east-1_LBf8LlhWB --region us-east-1 --client-id 2q824rr3duv29ln1oajmj6je8v --challenge-name NEW_PASSWORD_REQUIRED --challenge-responses NEW_PASSWORD=L@51Cygy,USERNAME=vinods03@gmail.com --session AYABeFKJQBEa-E_cov-Xfwe2Xq8AHQABAAdTZXJ2aWNlABBDb2duaXRvVXNlclBvb2xzAAEAB2F3cy1rbXMAS2Fybjphd3M6a21zOnVzLWVhc3QtMTo3NDU2MjM0Njc1NTU6a2V5L2IxNTVhZmNhLWJmMjktNGVlZC1hZmQ4LWE5ZTA5MzY1M2RiZQC4AQIBAHgDHnKSW2nDRJSDSLf55TGFyX5On_wV32whMfiMxuCEIAFbVVTpzx0TYAftQoryajANAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMcGUIubUA7bbVrxNfAgEQgDvgR0K4T6oK-dgQ0IHJb6vtErbYzKqUUjuUmTlWE4VbLEH2F45RJ5T9NpUQeeutTkz2E1Adeop84xEWNAIAAAAADAAAEAAAAAAAAAAAAAAAAABNgsAfAhD34YzHqIrSyPgR_____wAAAAEAAAAAAAAAAAAAAAEAAADVBneoV_wgSlwOxuminatVoKqK28XMGNbFyzEOKIKUbF_7X7cGrtSROM1WMxFA1JilOSJBLXaV9v7HMziD3ebzVwN4orOO95qhZ5MjpQVgUbsQ-GG4HULHn0jx6TX1Mn9YV0ruXTpFmGKCllJdaYpd12q7E5KGVxWB13olyHniFotsCQvQaA1drkiMOkwUU1TfY_WVif47uBD8RGQma6z2bBAVeAtlFWOwNgbMGAa9sgtOCQflCNv1fd5xRLKqOXMes1k6eZygN_HQ-caGZ3sAiOZhg6z6R_ZMwBWmOWfaScZwZxJPpA
+
+You will get Access Token, Refresh Token and Id Token. What we need is Id Token.
+
+=== API Gateway Authorizer
+
+Go to your API compare-yourself, Authorizers, create authorizer, compare-yourself-authorizer.
+
+Choose authorizer type as Cognito, choose the cognito user pool created above
+
+Set the "Token Source" as Authorization
+
+Test the authorizer now by passing the Id Token we got above in the "Token value" section. You must get a 200 code with a "Claims" json message.
+
+If the token value is wrong, you will get a 401 Unauthorized request error.
+
+=== API Gateway Resource / method level changes
+
+Go to your API / Resource / Method, where you want to enable Authorization
+
+In compare-yourself API / resource, POST method, method request, Authorization, select the authoriser created above.
+
+Deploy the API to the correct stage and you will get the Invoke URL: https://ap0qysyrn4.execute-api.us-east-1.amazonaws.com/Dev
+
+=== POSTMAN testing
+
+Open POSTMAN
+
+Enter the deplyment stage / resource URL (invoke URL + resource path) and the method (POST)
+https://ap0qysyrn4.execute-api.us-east-1.amazonaws.com/Dev/compare-yourself 
+
+In the Body of the Request, pass this:
+{
+    "personData": {
+        "name": "kulchalaka",
+        "city": "chennai",
+        "age": 33,
+        "height": 5,
+        "income": 115
+    }
+}
+
+In the "Headers", add the key "Authorization" and pass the Id token value created above.
+You should get a 200 OK message, also verify in DynamoDB, the record is loaded.
+If you do not pass the Authorization key or pass an Incorrect Authorization key, you will get the 401 Unauthorized error.
+
+=== Capture cognito user id for further processing
+
+Now, we will store / process the user-id of the cognito user in dynamo db (instead of random uuid generated within lambda).
+For this, add the below in the "Integration Request" mapping template, change the lambda function to capture this from event and then process it. 
+"userId" : "$context.authorizer.claims.sub"
+Remember to deploy the API as well as lambda function after the change.
+
+Again, test using POSTMAN.
+Note that since user_id is the Primary key in dynamo db table, you can insert only 1 record per cognito user now into the dynamodb table.
+However, attribute level validations can be done using lambda cloudwatch logs.
+
+
+
+Note:  When i made a change in API authorizer, the change was not reflecting for me.
+I removed it from API -> tested once in postman without auth -> again attached the authorizer and tested again. It worked.

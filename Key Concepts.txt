@@ -1,0 +1,11 @@
+The flow from API Gateway to Lambda is Method Request -> Integration Request
+The flow from Lambda to API Gateway is Integration Response -> Method Response
+
+Integration Request, Integration Response -> Mapping Templates -> extract from Request body, Path Parameters, Query Parameters
+Method Request -> model
+
+All of these templates and models are created using Apache Velocity Language
+
+
+
+
