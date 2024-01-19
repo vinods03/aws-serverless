@@ -1,2 +1,2 @@
 # aws-serverless
-AWS API Gateway, Lambda, DynamoDB to handle API requests
+AWS API Gateway, Cognito, Lambda, DynamoDB to handle authorized API requests
